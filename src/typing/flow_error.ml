@@ -159,6 +159,13 @@ type error_message =
   | EUnsafeGettersSetters of Loc.t
   | EUnusedSuppression of Loc.t
   | ELintSetting of LintSettings.lint_parse_error
+  | ESketchyBooleanOpLint of {
+      kind: Lints.sketchy_boolean_op_kind;
+      op: Lints.binary_boolean_op;
+      loc: Loc.t;
+      left_loc: Loc.t;
+      right_loc: Loc.t;
+    }
   | ESketchyNullLint of {
       kind: Lints.sketchy_null_kind;
       loc: Loc.t;
@@ -377,6 +384,7 @@ let util_use_op_of_msg nope util = function
 | EUnsafeGettersSetters (_)
 | EUnusedSuppression (_)
 | ELintSetting (_)
+| ESketchyBooleanOpLint {kind=_; op=_; loc=_; left_loc=_; right_loc=_}
 | ESketchyNullLint {kind=_; loc=_; null_loc=_; falsy_loc=_}
 | EInvalidPrototype (_)
 | EDeprecatedDeclareExports (_)
@@ -1764,6 +1772,43 @@ let rec error_of_msg ~trace_reasons ~source_file =
     in
     mk_error ~kind: ParseError [loc, [msg]]
 
+  | ESketchyBooleanOpLint { kind; op; loc; left_loc; right_loc } -> (
+    match kind with
+      | Lints.UnreachableBranch ->
+        let op_string, adjective = match op with
+          | Lints.And -> "&&", "falsy"
+          | Lints.Or -> "||", "truthy"
+        in
+        let message = (
+          (spf "Left side of %s is always %s," op_string adjective)
+          ^ " so the right side is unreachable."
+        )
+        in
+        mk_error
+          ~kind: (LintError (Lints.SketchyBooleanOp (kind, op)))
+          [loc, [message]]
+          ~extra:[InfoLeaf [
+            left_loc, [(spf "Always %s" adjective)];
+            right_loc, ["Unreachable code"];
+          ]]
+      | Lints.ConfusingOperator ->
+        let op_string, adjective = match op with
+          | Lints.And -> "&&", "truthy"
+          | Lints.Or -> "||", "falsy"
+        in
+        let message = (
+          (spf "Left side of %s is always %s," op_string adjective)
+          ^ " so the value is never used."
+        )
+        in
+        mk_error
+          ~kind: (LintError (Lints.SketchyBooleanOp (kind, op)))
+          [loc, [message]]
+          ~extra:[InfoLeaf [
+            left_loc, [(spf "Always %s" adjective)];
+            right_loc, [(spf "%s will always evaluate to this" op_string)];
+          ]]
+    )
   | ESketchyNullLint { kind; loc; null_loc; falsy_loc } ->
     let type_str, value_str = match kind with
     | Lints.SketchyBool -> "boolean", "Potentially false"

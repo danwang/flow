@@ -5,6 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  *)
 
+type binary_boolean_op =
+  | And
+  | Or
+
+type sketchy_boolean_op_kind =
+  | UnreachableBranch
+  | ConfusingOperator
+
 type sketchy_null_kind =
  | SketchyBool
  | SketchyString
@@ -12,6 +20,7 @@ type sketchy_null_kind =
  | SketchyMixed
 
 type lint_kind =
+ | SketchyBooleanOp of sketchy_boolean_op_kind * binary_boolean_op
  | SketchyNull of sketchy_null_kind
  | UntypedTypeImport
  | UntypedImport

@@ -1,0 +1,10 @@
+Error: test.js:6
+  6: x && y();
+     ^^^^^^^^ sketchy-boolean-op: Left side of && is always falsy, so the right side is unreachable.
+    6: x && y();
+       ^ Always falsy
+    6: x && y();
+            ^^^ Unreachable code
+
+
+Found 1 error

@@ -5,6 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  *)
 
+type binary_boolean_op =
+  | And
+  | Or
+
+type sketchy_boolean_op_kind =
+  | UnreachableBranch
+  | ConfusingOperator
+
 type sketchy_null_kind =
   | SketchyBool
   | SketchyString
@@ -12,6 +20,7 @@ type sketchy_null_kind =
   | SketchyMixed
 
 type lint_kind =
+  | SketchyBooleanOp of sketchy_boolean_op_kind * binary_boolean_op
   | SketchyNull of sketchy_null_kind
   | UntypedTypeImport
   | UntypedImport
@@ -27,6 +36,7 @@ let string_of_sketchy_null_kind = function
   | SketchyMixed -> "sketchy-null-mixed"
 
 let string_of_kind = function
+  | SketchyBooleanOp _ -> "sketchy-boolean-op"
   | SketchyNull kind -> string_of_sketchy_null_kind kind
   | UntypedTypeImport -> "untyped-type-import"
   | UntypedImport -> "untyped-import"
@@ -36,6 +46,12 @@ let string_of_kind = function
   | DeprecatedDeclareExports -> "deprecated-declare-exports"
 
 let kinds_of_string = function
+  | "sketchy-boolean-op" -> Some [
+      SketchyBooleanOp (UnreachableBranch, And);
+      SketchyBooleanOp (UnreachableBranch, Or);
+      SketchyBooleanOp (ConfusingOperator, And);
+      SketchyBooleanOp (ConfusingOperator, Or);
+    ]
   | "sketchy-null" -> Some [
       SketchyNull SketchyBool;
       SketchyNull SketchyString;

@@ -2696,6 +2696,22 @@ let dump_flow_error =
       | Redundant_argument -> "Redundant_argument"
       in
       spf "ELintSetting (%s, %s)" (string_of_loc loc) kind_str
+    | ESketchyBooleanOpLint { kind; op; loc; left_loc; right_loc } ->
+      let open Lints in
+      let kind_str = match kind with
+      | UnreachableBranch -> "UnreachableBranch"
+      | ConfusingOperator -> "ConfusingOperator"
+      in
+      let op_str = match op with
+      | And -> "And"
+      | Or -> "Or"
+      in
+      spf "ESketchyBooleanOpLint {kind=%s; op=%s; loc=%s; left_loc=%s; right_loc=%s}"
+        kind_str
+        op_str
+        (string_of_loc loc)
+        (string_of_loc left_loc)
+        (string_of_loc right_loc)
     | ESketchyNullLint { kind; loc; null_loc; falsy_loc } ->
       let open Lints in
       let kind_str = match kind with
