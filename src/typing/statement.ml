@@ -3363,6 +3363,44 @@ and logical cx loc = Ast.Expression.Logical.(function
         (fun () -> expression cx right)
       in
       let reason = mk_reason (RLogical ("&&", desc_of_t t1, desc_of_t t2)) loc in
+      let refined_left = match t1 with
+      | OpenT(_, tvar) -> (
+        let _, constraints = Flow_js.find_constraints cx tvar in
+        match constraints with
+        | Constraint.Resolved t -> t
+        | _ -> t1
+      )
+      | _ -> t1
+      in
+      let _, truthy_filtered = Type_filter.exists refined_left in
+      let _, falsy_filtered = Type_filter.not_exists refined_left in
+      let left_loc = Type.loc_of_t t1 in
+      let right_loc = Type.loc_of_t t2 in
+      let () = (
+        match truthy_filtered, falsy_filtered with
+        (* truthy *)
+        | false, _ ->
+          let message = Flow_error.ESketchyBooleanOpLint {
+            kind = Lints.ConfusingOperator;
+            op = Lints.And;
+            loc;
+            left_loc;
+            right_loc;
+          }
+          in
+          Flow_js.add_output cx message
+        | _, false ->
+          let message = Flow_error.ESketchyBooleanOpLint {
+            kind = Lints.UnreachableBranch;
+            op = Lints.And;
+            loc;
+            left_loc;
+            right_loc;
+          }
+          in
+          Flow_js.add_output cx message
+        | _ -> ()
+      ) in
       Tvar.mk_where cx reason (fun t ->
         Flow.flow cx (t1, AndT (reason, t2, t));
       )

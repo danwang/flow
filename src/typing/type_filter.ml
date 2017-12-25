@@ -43,10 +43,14 @@ let rec exists = function
   | DefT (r, NumT AnyLiteral) -> DefT (r, NumT Truthy), true
   | DefT (r, MixedT _) -> DefT (r, MixedT Mixed_truthy), true
 
+  (* recurse on unions *)
+  | DefT (r, UnionT rep) ->
+    recurse_into_union exists (r, UnionRep.members rep)
+
   (* truthy things pass through *)
   | t -> t, false
 
-let not_exists t = match t with
+let rec not_exists t = match t with
   (* falsy things pass through *)
   | DefT (_, (
       NullT
@@ -84,6 +88,10 @@ let not_exists t = match t with
   | DefT (r, BoolT None) -> DefT (r, BoolT (Some false)), true
   | DefT (r, StrT AnyLiteral) -> DefT (r, StrT (Literal (None, ""))), true
   | DefT (r, NumT AnyLiteral) -> DefT (r, NumT (Literal (None, (0., "0")))), true
+
+  (* recurse on unions *)
+  | DefT (r, UnionT rep) ->
+    recurse_into_union not_exists (r, UnionRep.members rep)
 
   (* things that don't track truthiness pass through *)
   | t -> t, false

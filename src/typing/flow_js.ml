@@ -2462,28 +2462,14 @@ let rec __flow cx ((l: Type.t), (u: Type.use_t)) trace =
       let reason = replace_reason_const (RBooleanLit false) reason in
       rec_flow_t cx trace (DefT (reason, BoolT (Some false)), tout)
 
-    | (left, AndT(reason, right, u)) ->
+    | (left, AndT(_, right, u)) ->
       (* a falsy && b ~> a
          a truthy && b ~> b
          a && b ~> a falsy | b *)
       let truthy_left, _ = Type_filter.exists left in
       (match truthy_left with
-      | DefT (lreason, EmptyT) ->
+      | DefT (_, EmptyT) ->
         (* falsy *)
-        let () =
-          let loc = Reason.loc_of_reason reason in
-          let left_loc = Reason.loc_of_reason lreason in
-          let right_loc = Reason.loc_of_reason (reason_of_t right) in
-          let message = FlowError.ESketchyBooleanOpLint {
-            kind = Lints.UnreachableBranch;
-            op = Lints.And;
-            loc;
-            left_loc;
-            right_loc;
-          }
-          in
-          add_output cx ~trace message
-          in
         rec_flow cx trace (left, PredicateT (NotP (ExistsP None), u))
       | _ ->
         (match Type_filter.not_exists left with
