@@ -72,8 +72,5 @@ var value: ?number = 0;
 var defaultVal: number = 7;
 var valToUse = value || defaultVal; /* sketchy */
 
-var alwaysFalse = false && value; /* NOT sketchy */
-var alwaysTrue = true || value; /* NOT sketchy */
-
 var sketchyFalse = value && false; /* sketchy */
 var sketchyTrue = value || true; /* sketchy */

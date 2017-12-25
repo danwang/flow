@@ -94,6 +94,14 @@ Error: simple_sketchies.js:73
    71: var value: ?number = 0;
                    ^^^^^^ Potentially 0 value.
 
+Error: simple_sketchies.js:75
+ 75: var alwaysFalse = false && value; /* NOT sketchy */
+                       ^^^^^^^^^^^^^^ sketchy-boolean-op: Left side of && is always falsy, so the right side is unreachable.
+   75: var alwaysFalse = false && value; /* NOT sketchy */
+                         ^^^^^ Always falsy
+   75: var alwaysFalse = false && value; /* NOT sketchy */
+                                  ^^^^^ Unreachable code
+
 Error: simple_sketchies.js:78
  78: var sketchyFalse = value && false; /* sketchy */
                         ^^^^^ sketchy-null-number: Sketchy null check on number value. Perhaps you meant to check for null instead of for existence?
@@ -111,4 +119,4 @@ Error: simple_sketchies.js:79
                    ^^^^^^ Potentially 0 value.
 
 
-Found 14 errors
+Found 15 errors

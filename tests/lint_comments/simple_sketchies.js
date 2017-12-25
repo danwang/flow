@@ -136,9 +136,6 @@ var value: ?number = 0;
 var defaultVal: number = 7;
 var valToUse = value || /* flowlint-line sketchy-null:off */defaultVal; /* sketchy; suppressed */
 
-var alwaysFalse = false && value; /* NOT sketchy */
-var alwaysTrue = true || value; /* NOT sketchy */
-
 //flowlint sketchy-null:error
 var val2: ?number = 0;
 /*flowlint sketchy-null:off*/ //Unused suppression

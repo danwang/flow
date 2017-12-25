@@ -94,16 +94,16 @@ Error: simple_sketchies.js:73
    71: var value: ?number = 0;
                    ^^^^^^ Potentially 0 value.
 
-Error: simple_sketchies.js:78
- 78: var sketchyFalse = value && false; /* sketchy */
+Error: simple_sketchies.js:75
+ 75: var sketchyFalse = value && false; /* sketchy */
                         ^^^^^ sketchy-null-number: Sketchy null check on number value. Perhaps you meant to check for null instead of for existence?
    71: var value: ?number = 0;
                   ^^^^^^^ Potentially null/undefined value.
    71: var value: ?number = 0;
                    ^^^^^^ Potentially 0 value.
 
-Error: simple_sketchies.js:79
- 79: var sketchyTrue = value || true; /* sketchy */
+Error: simple_sketchies.js:76
+ 76: var sketchyTrue = value || true; /* sketchy */
                        ^^^^^ sketchy-null-number: Sketchy null check on number value. Perhaps you meant to check for null instead of for existence?
    71: var value: ?number = 0;
                   ^^^^^^^ Potentially null/undefined value.
