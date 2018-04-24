@@ -316,6 +316,19 @@ export default suite(({addFile, addFiles, addCode}) => [
       <Bar {...props} />;
     `).noNewErrors(),
   ]),
+  test('Exact prop type with spread should work 2', [
+    addCode(`
+      // @jsx Foo
+      type Props = {|
+        a: string,
+      |};
+      function Foo(elem: number, props: Props) {}
+      const Bar = 123;
+
+      const props: {a: string} = {a: 'a', b: 'b'};
+      <Bar {...props} />;
+    `).noNewErrors(),
+  ]),
   test('Whitespace trimming', [
     addCode(`
       // @jsx Foo
